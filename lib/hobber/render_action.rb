@@ -4,10 +4,11 @@ require 'hobber/rendered_object'
 module Hobber
   class RenderAction
     def initialize robjects, &block
-      @robjects      = robjects
-      @tmpl_vars     = {}
-      @layouts        = []
-      @rewrite_paths = []
+      @robjects         = robjects
+      @tmpl_vars        = {}
+      @layouts          = []
+      @rewrite_paths    = []
+      @target_extention = nil
 
       if block
         block.arity <= 0 ? instance_eval(&block) : block.call(self)
@@ -24,7 +25,11 @@ module Hobber
     end
 
     def rewrite_path regexp, replacement
-      @rewrite_paths = [regexp, replacement]
+      @rewrite_paths << [regexp, replacement]
+    end
+
+    def target_extention ext
+      @target_extention = ext.to_s
     end
 
     # Performs the render actions by 
@@ -36,7 +41,8 @@ module Hobber
         RenderedObject.new(
           :data=>render_renderable_object(ro, @layouts),
           :renderable_object=>ro,
-          :path=>rewrite_path(ro.path, @rewrite_paths))
+          :layouts=> @layouts,
+          :path=>rewrite_paths(ro.path, @rewrite_paths))
       end
     end
 
@@ -61,7 +67,12 @@ module Hobber
       rewrites.each do |regexp, replacement|
         target_path.gsub!(regexp, replacement)
       end
-      target_paths
+
+      if @target_extention
+        target_path.gsub!(/\..*?$/, ".#{@target_extention}")
+      end
+
+      target_path
     end
   end
 end

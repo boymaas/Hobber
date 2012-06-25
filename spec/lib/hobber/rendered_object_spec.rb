@@ -7,7 +7,9 @@ module Hobber
         described_class.new(
           :data=>:data,
           :renderable_object=>:renderable_object,
-          :path=>:path)
+          :path=>:path,
+          :layouts=>:layouts
+        )
       end
     end
   end
