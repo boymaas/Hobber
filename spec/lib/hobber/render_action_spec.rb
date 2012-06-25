@@ -41,7 +41,13 @@ module Hobber
       it "overrides and renders layout and content templates" do
         render_action = RenderAction.new([content])
         render_action.layout(layout)
-        render_action.perform.should == <<-EOS.gsub(/^\s{10}/, '')
+
+        array_of_rendered_objects = render_action.perform
+        array_of_rendered_objects.should be_an(Array)
+
+        rendered_object = array_of_rendered_objects.first
+        rendered_object.should be_an(RenderedObject)
+        rendered_object.data.should == <<-EOS.gsub(/^\s{10}/, '')
           <h1>Title: a title</h1>
           
           <p>just some content</p>

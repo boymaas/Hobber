@@ -1,11 +1,12 @@
 require 'hobber/renderable_object'
+require 'hobber/rendered_object'
 
 module Hobber
   class RenderAction
     def initialize robjects, &block
       @robjects      = robjects
       @tmpl_vars     = {}
-      @layout        = []
+      @layouts        = []
       @rewrite_paths = []
 
       if block
@@ -15,7 +16,7 @@ module Hobber
 
     def layout robject
       raise ArgumentError.new('Expected RenderableObject as a layout') unless robject.is_a?(RenderableObject)
-      @layout << robject
+      @layouts << robject
     end
 
     def tmpl_vars vars
@@ -30,20 +31,37 @@ module Hobber
     # iterating over robjects with
     # the specified configuration
     def perform
-      result = ""
-      @robjects.each do |ro|
+      rendered_objects = 
+        @robjects.map do |ro|
+        RenderedObject.new(
+          :data=>render_renderable_object(ro, @layouts),
+          :renderable_object=>ro,
+          :path=>rewrite_path(ro.path, @rewrite_paths))
+      end
+    end
+
+    protected
+
+    def render_renderable_object ro, layouts=[]
         tmpl_vars = {}
         tmpl_vars.merge(ro.tmpl_vars)
 
         result = ro.render(tmpl_vars)
 
-        render_chain = @layout.reverse
+        render_chain = layouts.reverse
         render_chain.each do |layout|
           tmpl_vars = layout.tmpl_vars.merge(tmpl_vars)
           result = layout.render(tmpl_vars) { result }
         end
+        result
+    end
+
+    def rewrite_paths path, rewrites
+      target_path = path.dup
+      rewrites.each do |regexp, replacement|
+        target_path.gsub!(regexp, replacement)
       end
-      result
+      target_paths
     end
   end
 end
