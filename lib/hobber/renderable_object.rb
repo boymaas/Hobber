@@ -13,11 +13,16 @@ module Hobber
       data = File.read(@path)
       _render_template_chain(@path, data, context, vars)
     end
+    
+    def to_a
+      [self]
+    end
 
     private
 
     def _render_template_chain(path, data, context, vars)
-      # termination condition
+      # termination condition, if tilt template class
+      # is  
       tilt_template_class = Tilt[path]
       unless tilt_template_class
         return data

@@ -3,11 +3,11 @@ require 'hobber'
 describe "hobber renders a blog" do
   before { extend Hobber }
   it "scans and loads files wich are rendered to a target directory" do
-    chdir File.dirname(__FILE__) 
-    blog_posts  = scan 'source/posts/**/*'
-    index_page  = file 'source/index'
-    main_layout = file 'source/layout'
-    blog_layout = file 'source/posts/layout'
+    # chdir File.dirname(__FILE__) 
+    blog_posts  = scan 'spec/miniblog/posts/**/*'
+    index_page  = file 'spec/miniblog/index'
+    main_layout = file 'spec/miniblog/layout/main'
+    blog_layout = file 'spec/miniblog/layout/post'
 
     render blog_posts, :layout => blog_layout, :to => 'output/posts/'
 

@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'tilt'
 gem 'rdiscount'
+gem 'contracts'
 
 group :development do
   gem 'pry'
