@@ -26,10 +26,24 @@ module Hobber
       @rewrite_paths = [regexp, replacement]
     end
 
+    # Performs the render actions by 
+    # iterating over robjects with
+    # the specified configuration
     def perform
+      result = ""
       @robjects.each do |ro|
-        puts "Rendering #{ro.path}" 
+        tmpl_vars = {}
+        tmpl_vars.merge(ro.tmpl_vars)
+
+        result = ro.render(tmpl_vars)
+
+        render_chain = @layout.reverse
+        render_chain.each do |layout|
+          tmpl_vars = layout.tmpl_vars.merge(tmpl_vars)
+          result = layout.render(tmpl_vars) { result }
+        end
       end
+      result
     end
   end
 end

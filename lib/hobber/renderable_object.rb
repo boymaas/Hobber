@@ -11,9 +11,9 @@ module Hobber
       @data = yield(self) if block_given?
     end
 
-    def render(vars={})
+    def render(vars={}, &block)
       context = Object.new
-      _render_template_chain(@path, data, context, vars)
+      _render_template_chain(@path, data, context, vars, &block)
     end
     
     def to_a
@@ -41,7 +41,7 @@ module Hobber
 
     private
 
-    def _render_template_chain(path, data, context, vars)
+    def _render_template_chain(path, data, context, vars, &block)
       # termination condition, if tilt template class
       # is  
       tilt_template_class = Tilt[path]
@@ -53,11 +53,11 @@ module Hobber
 
       # remove extention
       path = path.gsub(/\.\w+$/,'')
-      data = template.render(context, vars)
+      data = template.render(context, vars, &block)
 
       # iterate again to next available template 
       # engine
-      _render_template_chain(path, data, context, vars)
+      _render_template_chain(path, data, context, vars, &block)
     end
   end
 end

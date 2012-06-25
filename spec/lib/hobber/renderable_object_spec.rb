@@ -31,6 +31,24 @@ module Hobber
           subject.tmpl_vars.should == {}
         end
       end
+      context "with one tmpl_vars specified" do
+        subject do
+          described_class.new('path_to_template.mkd') {
+            <<-EOS.gsub(/^\s{12}/, '')
+              ---
+              title: a title
+              ---
+
+              # Title
+            EOS
+          } 
+        end
+        it "returns the template vars" do
+          subject.tmpl_vars.should == {
+            'title' => 'a title',
+          }
+        end
+      end
       context "with tmpl_vars specified" do
         subject do
           described_class.new('path_to_template.mkd') {
