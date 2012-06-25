@@ -9,12 +9,29 @@ module Hobber
     end
 
     def render(vars={})
-      ctx = vars.fetch(:binding, Object.new)
-      unless Tilt[@path]
-        return File.read(@path)
+      context = vars.fetch(:binding, Object.new)
+      data = File.read(@path)
+      _render_template_chain(@path, data, context, vars)
+    end
+
+    private
+
+    def _render_template_chain(path, data, context, vars)
+      # termination condition
+      tilt_template_class = Tilt[path]
+      unless tilt_template_class
+        return data
       end
-      @template ||= Tilt.new(@path)
-      @template.render(ctx, vars)
+
+      template = tilt_template_class.new(@path) { |t| data }
+
+      # remove extention
+      path = path.gsub(/\.\w+$/,'')
+      data = template.render(context, vars)
+
+      # iterate again to next available template 
+      # engine
+      _render_template_chain(path, data, context, vars)
     end
   end
 end
