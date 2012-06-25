@@ -52,7 +52,7 @@ module Hobber
         rendered_object = array_of_rendered_objects.first
         rendered_object.should be_an(RenderedObject)
         rendered_object.data.should == <<-EOS.gsub(/^\s{10}/, '')
-          <h1>Title: a title</h1>
+          <h1>Title: a overridden title</h1>
           
           <p>just some content</p>
         EOS

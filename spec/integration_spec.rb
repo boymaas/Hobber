@@ -4,7 +4,15 @@ describe "hobber renders a blog" do
   before { extend Hobber }
   before { chdir 'spec/miniblog' }
   after  { chdir '../..' }
+
+  let(:shell) { stub(:shell) }
+
   before do
+    Hobber.stub(:shell => shell)
+    shell.stub(:yes?).and_return(true)
+
+    remove_output_dir 'output'
+
     blog_posts   = scan 'source/posts/**/*'
     index_page   = file 'source/index.haml'
     main_layout  = file 'source/layout/main.haml'
@@ -29,7 +37,7 @@ describe "hobber renders a blog" do
     @rendered_blog_posts = rendered_blog_posts
     @rendered_home_page  = rendered_home_page
 
-    save [rendered_home_page, rendered_blog_posts]
+    save [rendered_home_page, rendered_blog_posts], :logger => stub(:logger).as_null_object
   end
 
   it "renders 4 blog posts" do
@@ -56,5 +64,9 @@ describe "hobber renders a blog" do
     @rendered_home_page.data.should include('post002.html')
     @rendered_home_page.data.should include('post003.html')
     @rendered_home_page.data.should include('post004.html')
+  end
+
+  it "rendered all files" do
+    Dir['output/**/*.html'].count.should == 5
   end
 end
