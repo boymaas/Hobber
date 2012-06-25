@@ -36,10 +36,9 @@ module Hobber
     # iterating over robjects with
     # the specified configuration
     def perform
-      rendered_objects = 
-        @robjects.map do |ro|
+      @robjects.map do |ro|
         RenderedObject.new(
-          :data=>render_renderable_object(ro, @layouts),
+          :data=>render_renderable_object(ro, @tmpl_vars, @layouts),
           :renderable_object=>ro,
           :layouts=> @layouts,
           :path=>rewrite_paths(ro.path, @rewrite_paths))
@@ -48,9 +47,8 @@ module Hobber
 
     protected
 
-    def render_renderable_object ro, layouts=[]
-        tmpl_vars = {}
-        tmpl_vars.merge(ro.tmpl_vars)
+    def render_renderable_object ro, tmpl_vars={}, layouts=[]
+        tmpl_vars.merge!(ro.tmpl_vars)
 
         result = ro.render(tmpl_vars)
 

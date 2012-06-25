@@ -58,6 +58,8 @@ module Hobber
       # iterate again to next available template 
       # engine
       _render_template_chain(path, data, context, vars, &block)
+    rescue => e
+      raise "#{self.class}: While rendering #{path} with #{tilt_template_class}: #{e.message}"
     end
   end
 end
