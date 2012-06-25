@@ -1,21 +1,42 @@
 require 'tilt'
+require 'yaml'
 
 module Hobber
+  class ProblemParsingYaml < RuntimeError; end
   class RenderableObject
-    attr_reader :path
+    attr_reader :path, :data
 
     def initialize(path)
       @path = path 
+      @data = yield(self) if block_given?
     end
 
     def render(vars={})
-      context = vars.fetch(:binding, Object.new)
-      data = File.read(@path)
+      context = Object.new
       _render_template_chain(@path, data, context, vars)
     end
     
     def to_a
       [self]
+    end
+
+    def data
+      @data ||= File.read(@path)
+    end
+
+    def tmpl_vars
+      @tmpl_vars ||= _extract_tmpl_vars
+    end
+    def _extract_tmpl_vars
+      @tmpl_vars = {}
+      if data.match(/\s*---.*---/m)
+        ignore, yaml_buffer, template_data = data.split(/---/,3)
+        @data = template_data
+        @tmpl_vars = YAML.parse(yaml_buffer).to_ruby
+      end
+      @tmpl_vars
+    rescue Psych::SyntaxError => e
+      raise ProblemParsingYaml.new([e.message, "while trying to extract tmpl_vars from [#{path}]"] * " -- ")
     end
 
     private
