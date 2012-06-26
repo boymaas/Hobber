@@ -3,6 +3,7 @@ require 'yaml'
 
 module Hobber
   class ProblemParsingYaml < RuntimeError; end
+  class RenderError < RuntimeError; end
   class RenderableObject
     attr_reader :path, :data
 
@@ -59,7 +60,9 @@ module Hobber
       # engine
       _render_template_chain(path, data, context, vars, &block)
     rescue => e
-      raise "#{self.class}: While rendering #{path} with #{tilt_template_class}: #{e.message}"
+      render_error = RenderError.new("#{self.class}: While rendering #{path} with #{tilt_template_class}: #{e.message}")
+      render_error.set_backtrace(e.backtrace)
+      raise render_error 
     end
   end
 end
