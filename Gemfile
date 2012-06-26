@@ -1,11 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'tilt'
-gem 'rdiscount'
-gem 'contracts'
-gem 'haml'
-gem 'thor'
-
 group :development do
   gem 'pry'
   gem 'rspec'

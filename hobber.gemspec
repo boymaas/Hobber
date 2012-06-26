@@ -17,7 +17,6 @@ Gem::Specification.new do |gem|
   
   gem.add_dependency 'tilt'
   gem.add_dependency 'rdiscount'
-  gem.add_dependency 'contracts'
   gem.add_dependency 'haml'
   gem.add_dependency 'thor'
 end
