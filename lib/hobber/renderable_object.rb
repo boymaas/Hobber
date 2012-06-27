@@ -1,5 +1,7 @@
 require 'tilt'
 require 'yaml'
+require 'active_support/core_ext/hash/indifferent_access'
+
 
 module Hobber
   class ProblemParsingYaml < RuntimeError; end
@@ -21,6 +23,10 @@ module Hobber
       [self]
     end
 
+    def [](key)
+      tmpl_vars.fetch(key)
+    end
+
     def data
       @data ||= File.read(@path)
     end
@@ -35,7 +41,7 @@ module Hobber
         @data = template_data
         @tmpl_vars = YAML.parse(yaml_buffer).to_ruby
       end
-      @tmpl_vars
+      HashWithIndifferentAccess.new(@tmpl_vars)
     rescue Psych::SyntaxError => e
       raise ProblemParsingYaml.new([e.message, "while trying to extract tmpl_vars from [#{path}]"] * " -- ")
     end

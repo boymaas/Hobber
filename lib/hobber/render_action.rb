@@ -8,6 +8,7 @@ module Hobber
       @tmpl_vars        = {}
       @layouts          = []
       @rewrite_paths    = []
+      @rewrite_urls    = []
       @target_extention = nil
 
       if block
@@ -28,6 +29,10 @@ module Hobber
       @rewrite_paths << [regexp, replacement]
     end
 
+    def rewrite_url regexp, replacement
+      @rewrite_urls << [regexp, replacement]
+    end
+
     def target_extention ext
       @target_extention = ext.to_s
     end
@@ -41,7 +46,8 @@ module Hobber
           :data=>render_renderable_object(ro, @tmpl_vars, @layouts),
           :renderable_object=>ro,
           :layouts=> @layouts,
-          :path=>rewrite_paths(ro.path, @rewrite_paths))
+          :path=>rewrite_paths(ro.path, @rewrite_paths),
+          :url=>rewrite_paths(ro.path, @rewrite_urls))
       end
     end
 
@@ -49,6 +55,7 @@ module Hobber
 
     def render_renderable_object ro, tmpl_vars={}, layouts=[]
         tmpl_vars.merge!(ro.tmpl_vars)
+        tmpl_vars.merge!(:current_renderable_object => ro)
 
         result = ro.render(tmpl_vars)
 

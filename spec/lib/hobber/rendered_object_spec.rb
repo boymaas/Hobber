@@ -8,7 +8,8 @@ module Hobber
           :data=>:data,
           :renderable_object=>:renderable_object,
           :path=>:path,
-          :layouts=>:layouts
+          :layouts=>:layouts,
+          :url=>:url
         )
       end
     end
