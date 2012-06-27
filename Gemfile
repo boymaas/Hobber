@@ -1,10 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'tilt'
-gem 'rdiscount'
-gem 'contracts'
-gem 'haml'
-gem 'thor'
+gem "active_support"
 
 group :development do
   gem 'pry'
