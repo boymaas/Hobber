@@ -14,8 +14,7 @@ module Hobber
       @data = yield(self) if block_given?
     end
 
-    def render(vars={}, &block)
-      context = Object.new
+    def render(vars={}, context=Object.new, &block)
       _render_template_chain(@path, data, context, vars, &block)
     end
     
@@ -24,7 +23,11 @@ module Hobber
     end
 
     def [](key)
-      tmpl_vars.fetch(key)
+      tmpl_vars[key]
+    end
+
+    def fetch(*a)
+      tmpl_vars.fetch(*a)
     end
 
     def data

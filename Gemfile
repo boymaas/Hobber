@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-gem "active_support"
-
 group :development do
   gem 'pry'
   gem 'rspec'
