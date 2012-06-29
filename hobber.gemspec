@@ -16,8 +16,6 @@ Gem::Specification.new do |gem|
   gem.version       = Hobber::VERSION
   
   gem.add_dependency 'tilt'
-  gem.add_dependency 'rdiscount'
-  gem.add_dependency 'haml'
   gem.add_dependency 'thor'
 
   gem.add_dependency "active_support"

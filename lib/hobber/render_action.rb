@@ -11,9 +11,9 @@ module Hobber
       @tmpl_vars        = {}
       @layouts          = []
       @rewrite_paths    = []
-      @rewrite_urls    = []
+      @rewrite_urls     = []
       @target_extention = nil
-      @caller_binding = binding || ( block && block.binding )
+      @caller_binding   = binding || ( block && block.binding )
 
       if block
         block.arity <= 0 ? instance_eval(&block) : block.call(self)
