@@ -1,5 +1,5 @@
 require 'hobber/renderer/tilt'
-require 'hobber/tmpl_var_extractor'
+require 'hobber/tmpl_var_extractor/yaml'
 
 module Hobber
   class RenderError < RuntimeError; end
@@ -12,7 +12,7 @@ module Hobber
       @tmpl_content = block_given? ? yield(self) : File.read(@path)
 
       @renderer           = a_renderer           || Renderer::Tilt.new
-      @tmpl_var_extractor = a_tmpl_var_extractor || TmplVarExtractor.new(@tmpl_content, @path)
+      @tmpl_var_extractor = a_tmpl_var_extractor || TmplVarExtractor::Yaml.new(@tmpl_content, @path)
     end
 
     def render(vars={}, ctx=Object.new, &block)
