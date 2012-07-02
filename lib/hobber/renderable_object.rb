@@ -1,22 +1,31 @@
-require 'tilt'
 require 'yaml'
 require 'active_support/core_ext/hash/indifferent_access'
+require 'hobber/renderer/tilt'
 
 module Hobber
   class ProblemParsingYaml < RuntimeError; end
   class RenderError < RuntimeError; end
   class RenderableObject
-    attr_reader :path, :data
+    attr_reader :path, :data, :renderer
 
-    def initialize(path)
+    def initialize(path, a_renderer=nil)
       @path = path 
       @data = yield(self) if block_given?
+      @renderer = a_renderer
     end
 
-    def render(vars={}, context=Object.new, &block)
-      _render_template_chain(@path, data, context, vars, &block)
+    def data
+      @data ||= File.read(@path)
     end
-    
+
+    def renderer
+      @renderer ||= Renderer::Tilt.new(path, data)
+    end
+
+    def render(vars={}, ctx=Object.new, &block)
+      renderer.render(path, data, ctx, tmpl_vars.merge(vars), &block)
+    end
+
     def to_a
       [self]
     end
@@ -29,13 +38,11 @@ module Hobber
       tmpl_vars.fetch(*a)
     end
 
-    def data
-      @data ||= File.read(@path)
-    end
 
     def tmpl_vars
       @tmpl_vars ||= _extract_tmpl_vars
     end
+
     def _extract_tmpl_vars
       @tmpl_vars = {}
       if data.match(/\s*---.*---/m)
@@ -46,31 +53,6 @@ module Hobber
       HashWithIndifferentAccess.new(@tmpl_vars)
     rescue Psych::SyntaxError => e
       raise ProblemParsingYaml.new([e.message, "while trying to extract tmpl_vars from [#{path}]"] * " -- ")
-    end
-
-    private
-
-    def _render_template_chain(path, data, context, vars, &block)
-      # termination condition, if tilt template class
-      # is  
-      tilt_template_class = Tilt[path]
-      unless tilt_template_class
-        return data
-      end
-
-      template = tilt_template_class.new(@path) { |t| data }
-
-      # remove extention
-      path = path.gsub(/\.\w+$/,'')
-      data = template.render(context, vars, &block)
-
-      # iterate again to next available template 
-      # engine
-      _render_template_chain(path, data, context, vars, &block)
-    rescue => e
-      render_error = RenderError.new("#{self.class}: While rendering #{path} with #{tilt_template_class}: #{e.message}")
-      render_error.set_backtrace(e.backtrace)
-      raise render_error 
     end
   end
 end
