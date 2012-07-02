@@ -13,7 +13,7 @@ module Hobber
       @path = path 
       @tmpl_content = block_given? ? yield(self) : File.read(@path)
 
-      @renderer           = a_renderer || Renderer::Tilt.new
+      @renderer           = a_renderer           || Renderer::Tilt.new
       @tmpl_var_extractor = a_tmpl_var_extractor || TmplVarExtractor.new(@tmpl_content, @path)
     end
 
