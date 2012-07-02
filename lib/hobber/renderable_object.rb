@@ -1,5 +1,3 @@
-require 'yaml'
-require 'active_support/core_ext/hash/indifferent_access'
 require 'hobber/renderer/tilt'
 require 'hobber/tmpl_var_extractor'
 
@@ -10,7 +8,7 @@ module Hobber
     attr_reader :path, :tmpl_content, :renderer
 
     def initialize(path, a_renderer=nil, a_tmpl_var_extractor=nil)
-      @path = path 
+      @path         = path
       @tmpl_content = block_given? ? yield(self) : File.read(@path)
 
       @renderer           = a_renderer           || Renderer::Tilt.new

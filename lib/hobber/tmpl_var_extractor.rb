@@ -1,3 +1,6 @@
+require 'yaml'
+require 'active_support/core_ext/hash/indifferent_access'
+
 module Hobber
   class ProblemParsingYaml < RuntimeError; end
   class TmplVarExtractor
