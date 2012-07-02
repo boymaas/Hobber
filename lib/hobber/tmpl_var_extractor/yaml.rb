@@ -24,8 +24,12 @@ module Hobber
           @tmpl_vars = YAML.parse(yaml_buffer).to_ruby
           @tmpl_vars = HashWithIndifferentAccess.new(@tmpl_vars)
         end
-      rescue Psych::SyntaxError => e
-        raise ProblemParsingYaml.new([e.message, "while trying to extract tmpl_vars from [#{@path}]"] * " -- ")
+      # rescue Psych::SyntaxError => e
+      rescue => e
+        debugger
+        error = ProblemParsingYaml.new(["#{e.message} (#{e.class})", "while trying to extract tmpl_vars from [#{@path}]"] * " -- ")
+        error.set_backtrace(e.backtrace)
+        raise error
       end
     end
   end

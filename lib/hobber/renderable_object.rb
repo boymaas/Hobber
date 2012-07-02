@@ -9,7 +9,7 @@ module Hobber
 
     def initialize(path, a_renderer=nil, a_tmpl_var_extractor=nil)
       @path         = path
-      @tmpl_content = block_given? ? yield(self) : File.read(@path)
+      @tmpl_content = block_given? ? yield(self) : File.open(@path, 'r:UTF-8') { |f| f.read }
 
       @renderer           = a_renderer           || Renderer::Tilt.new
       @tmpl_var_extractor = a_tmpl_var_extractor || TmplVarExtractor::Yaml.new(@tmpl_content, @path)
