@@ -6,7 +6,7 @@ module Hobber
     subject {described_class.new([])}
     context "#layout" do
       it "adds a layout" do
-        robject = RenderableObject.new('a_path')
+        robject = RenderableObject.new('a_path') { '' }
         subject.layout robject
       end
       it "raises when adding something other than RenderableObject" do

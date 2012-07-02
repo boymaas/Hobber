@@ -1,29 +1,24 @@
 require 'yaml'
 require 'active_support/core_ext/hash/indifferent_access'
 require 'hobber/renderer/tilt'
+require 'hobber/tmpl_var_extractor'
 
 module Hobber
-  class ProblemParsingYaml < RuntimeError; end
   class RenderError < RuntimeError; end
+
   class RenderableObject
-    attr_reader :path, :data, :renderer
+    attr_reader :path, :tmpl_content, :renderer
 
-    def initialize(path, a_renderer=nil)
+    def initialize(path, a_renderer=nil, a_tmpl_var_extractor=nil)
       @path = path 
-      @data = yield(self) if block_given?
-      @renderer = a_renderer
-    end
+      @tmpl_content = block_given? ? yield(self) : File.read(@path)
 
-    def data
-      @data ||= File.read(@path)
-    end
-
-    def renderer
-      @renderer ||= Renderer::Tilt.new(path, data)
+      @renderer           = a_renderer || Renderer::Tilt.new
+      @tmpl_var_extractor = a_tmpl_var_extractor || TmplVarExtractor.new(@tmpl_content, @path)
     end
 
     def render(vars={}, ctx=Object.new, &block)
-      renderer.render(path, data, ctx, tmpl_vars.merge(vars), &block)
+      @renderer.render(path, tmpl_content, ctx, tmpl_vars.merge(vars), &block)
     end
 
     def to_a
@@ -38,21 +33,12 @@ module Hobber
       tmpl_vars.fetch(*a)
     end
 
-
-    def tmpl_vars
-      @tmpl_vars ||= _extract_tmpl_vars
+    def tmpl_content
+      @tmpl_var_extractor.tmpl_content
     end
 
-    def _extract_tmpl_vars
-      @tmpl_vars = {}
-      if data.match(/\s*---.*---/m)
-        ignore, yaml_buffer, template_data = data.split(/---/,3)
-        @data = template_data
-        @tmpl_vars = YAML.parse(yaml_buffer).to_ruby
-      end
-      HashWithIndifferentAccess.new(@tmpl_vars)
-    rescue Psych::SyntaxError => e
-      raise ProblemParsingYaml.new([e.message, "while trying to extract tmpl_vars from [#{path}]"] * " -- ")
+    def tmpl_vars
+      @tmpl_var_extractor.tmpl_vars
     end
   end
 end
