@@ -36,9 +36,9 @@ module Hobber
 
     def _parse_rewrite_args *args
       if args.count == 1 && args[0].is_a?(Hash)
-        regexp, replacement = args[0].keys.first, args[0].values.first 
+        regexp, replacement = args[0].keys.first, args[0].values.first
       elsif args.count == 2
-        regexp, replacement = args 
+        regexp, replacement = args
       else
         raise ArgumentError.new('[rewrite_path] Expected either [regexp => sub] or [regexp, replacement] as arguments')
       end
@@ -59,7 +59,7 @@ module Hobber
       @target_extention = ext.to_s
     end
 
-    # Performs the render actions by 
+    # Performs the render actions by
     # iterating over robjects with
     # the specified configuration
     def perform
@@ -87,6 +87,10 @@ module Hobber
           result = layout.render(tmpl_vars, @caller_binding) { result }
         end
         result
+    rescue RenderError => e
+      re = RenderError.new("While rendering [#{ro.path}] => #{e.message}")
+      re.set_backtrace(e.backtrace)
+      throw re
     end
 
     def _rewrite_paths path, rewrites

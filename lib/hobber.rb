@@ -45,7 +45,10 @@ module Hobber
     if safe_mode && no?("Do you want to remove output dir [#{dirname.realpath}]? (y/yes/other=no)")
       return
     end
-    FileUtils.rm_r dirname.realpath
+    # NOTE: remove all files in directory, in a way
+    #       that when a server is running in that dir
+    #       oparations wont be impaired
+    FileUtils.rm_r(Dir.glob(dirname.realpath.to_s + "/*"))
   rescue Errno::ENOENT
     # directory does not resolve
   end
@@ -53,7 +56,7 @@ module Hobber
   def chdir path, &block
     Dir.chdir(path, &block)
   end
-  
+
   def scan glob
     Dir[glob].map { |p| RenderableObject.new(p) }
   end
@@ -77,7 +80,7 @@ module Hobber
     robjects.is_a?(Array) ? rendered_objects : rendered_objects.first
   end
 
-  def save *args 
+  def save *args
     options = args.last.is_a?(Hash) ? args.pop : {}
     logger  = options.fetch(:logger, Logger.new(STDOUT))
     safe_mode = options.fetch(:safe, false)
